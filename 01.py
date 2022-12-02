@@ -27,7 +27,9 @@ def main(filepath: str):
               | str_to_int
               | reduce(sum)
               )
-        | reduce(max)
+        | sort
+        | tail(3)
+        | reduce(sum)
     )
 
 
