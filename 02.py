@@ -52,7 +52,7 @@ def main(filepath: str):
         | map(symbol_score)
     )
 
-    score_from_choice = print(
+    output(
         sum(score_from_win)
         + sum(score_from_choice)
     )

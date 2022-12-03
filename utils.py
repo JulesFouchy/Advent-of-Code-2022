@@ -38,9 +38,19 @@ def reduce(iter, binary_operation, default_value=None):
     return val
 
 
-@Pipe
-def log(iter):
-    print(iter)
+def is_iterable(x):
+    try:
+        iter(x)
+        return True
+    except TypeError:
+        return False
+
+
+def output(x):
+    if is_iterable(x):
+        print(list(x))
+    else:
+        print(x)
 
 
 @Pipe

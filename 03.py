@@ -31,7 +31,7 @@ def priority(letter: str):
 
 
 def main(filepath: str):
-    print(
+    output(
         lines(filepath)
         | groups_of(3)
         | map(find_common_letter)

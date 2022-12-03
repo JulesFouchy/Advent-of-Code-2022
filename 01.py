@@ -20,7 +20,7 @@ def str_to_int(iter):
 
 
 def main(filepath: str):
-    print(
+    output(
         lines(filepath)
         | group_on_empty_line
         | map(lambda list: list
