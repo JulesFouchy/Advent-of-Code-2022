@@ -1,6 +1,11 @@
 from pipe import Pipe
 
 
+def day_number(filepath: str):
+    import pathlib
+    return pathlib.Path(filepath).stem
+
+
 def lines(filepath: str):
     """
     Generator that returns each line of the file, one by one.
@@ -16,8 +21,21 @@ def lines(filepath: str):
 
 
 @Pipe
-def reduce(iter, op):
+def apply(iter, op):
     return op(iter)
+
+
+@Pipe
+def reduce(iter, binary_operation, default_value=None):
+    """`default_value` is what will be returned if the iterable `iter` is empty"""
+    try:
+        val = next(iter)
+    except StopIteration:
+        return default_value
+
+    for x in iter:
+        val = binary_operation(val, x)
+    return val
 
 
 @Pipe
@@ -25,6 +43,13 @@ def log(iter):
     print(iter)
 
 
-def day_number(filepath: str):
-    import pathlib
-    return pathlib.Path(filepath).stem
+@Pipe
+def groups_of(iter, n: int):
+    try:
+        while True:
+            group = []
+            for _ in range(n):
+                group.append(next(iter))
+            yield group
+    except StopIteration:
+        pass

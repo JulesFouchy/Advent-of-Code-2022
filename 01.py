@@ -25,11 +25,11 @@ def main(filepath: str):
         | group_on_empty_line
         | map(lambda list: list
               | str_to_int
-              | reduce(sum)
+              | apply(sum)
               )
         | sort
         | tail(3)
-        | reduce(sum)
+        | apply(sum)
     )
 
 

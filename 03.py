@@ -1,29 +1,26 @@
 from pipe import *
 from utils import *
 from dataclasses import dataclass
-
-
-@dataclass
-class Compartments:
-    first: str
-    second: str
-
-
-def split_into_compartments(line: str):
-    return Compartments(
-        line[: len(line) // 2],
-        line[len(line) // 2:],
-    )
+from typing import List
 
 
 def str_to_set(s: str):
     return {c for c in s}
 
 
-def find_common_letter(compartments: Compartments):
-    set1 = str_to_set(compartments.first)
-    set2 = str_to_set(compartments.second)
-    return set1.intersection(set2).pop()
+def intersect(x: set, y: set):
+    return x.intersection(y)
+
+
+def find_common_letter(strings: List[str]):
+    return (
+        (
+            strings
+            | map(str_to_set)
+            | reduce(intersect)
+        )
+        .pop()
+    )
 
 
 def priority(letter: str):
@@ -36,10 +33,10 @@ def priority(letter: str):
 def main(filepath: str):
     print(
         lines(filepath)
-        | map(split_into_compartments)
+        | groups_of(3)
         | map(find_common_letter)
         | map(priority)
-        | reduce(sum)
+        | apply(sum)
     )
 
 
