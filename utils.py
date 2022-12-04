@@ -63,3 +63,8 @@ def groups_of(iter, n: int):
             yield group
     except StopIteration:
         pass
+
+
+@Pipe
+def count_elements(iter):
+    return sum(1 for _ in iter)
