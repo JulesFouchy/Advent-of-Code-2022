@@ -32,8 +32,10 @@ class Instruction:
     to_idx: int
 
 def apply_instruction(out__stacks: List[List[str]], instruction: Instruction):
-    for _ in range(instruction.quantity):
-        out__stacks[instruction.to_idx].append(out__stacks[instruction.from_idx].pop())
+    out__stacks[instruction.to_idx].extend(
+        out__stacks[instruction.from_idx][-instruction.quantity:]
+    )
+    del out__stacks[instruction.from_idx][-instruction.quantity:]
 
 def main(filepath: str):
     import pathlib
