@@ -25,11 +25,13 @@ def parse_stacks(lines: List[str]):
 
     return stacks, line_idx + 2
 
+
 @dataclass
 class Instruction:
     quantity: int
     from_idx: int
     to_idx: int
+
 
 def apply_instruction(out__stacks: List[List[str]], instruction: Instruction):
     out__stacks[instruction.to_idx].extend(
@@ -37,11 +39,13 @@ def apply_instruction(out__stacks: List[List[str]], instruction: Instruction):
     )
     del out__stacks[instruction.from_idx][-instruction.quantity:]
 
+
 def main(filepath: str):
     import pathlib
     from os import path
     with open(path.join(pathlib.Path(__file__).parent.resolve(), filepath), 'r') as file:
-        lines = list(file.readlines() | map(lambda line: line.removesuffix('\n')))
+        lines = list(file.readlines() | map(
+            lambda line: line.removesuffix('\n')))
         stacks, instructions_line_idx = parse_stacks(lines)
 
         for i in range(instructions_line_idx, len(lines)):
@@ -54,7 +58,7 @@ def main(filepath: str):
             ))
 
         output(
-            ''.join(stacks | map(lambda stack : stack[-1]))
+            ''.join(stacks | map(lambda stack: stack[-1]))
         )
 
 
