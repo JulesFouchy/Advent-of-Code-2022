@@ -47,7 +47,9 @@ def is_iterable(x):
 
 
 def output(x):
-    if is_iterable(x):
+    if isinstance(x, str):
+        print(x)
+    elif is_iterable(x):
         print(list(x))
     else:
         print(x)
