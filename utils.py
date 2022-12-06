@@ -20,6 +20,17 @@ def lines(filepath: str):
             yield line.removesuffix('\n')
 
 
+def characters(filepath: str):
+    """
+    Generator that returns each character of the file, one by one.
+    """
+    import pathlib
+    from os import path
+    with open(path.join(pathlib.Path(__file__).parent.resolve(), filepath), 'r') as file:
+        for letter in iter(lambda: file.read(1), ''):
+            yield letter
+
+
 @Pipe
 def apply(iter, op):
     return op(iter)
@@ -68,5 +79,26 @@ def groups_of(iter, n: int):
 
 
 @Pipe
+def sliding_tuple(iter, length: int):
+    tuple = []
+    for x in iter:
+        tuple.append(x)
+        if len(tuple) > length:
+            tuple.pop(0)
+        if len(tuple) == length:
+            yield list(tuple)
+
+    if len(tuple) < length:
+        yield tuple
+
+@Pipe
 def count_elements(iter):
     return sum(1 for _ in iter)
+
+
+def index_of_first(iter, predicate):
+    i = 0
+    for x in iter:
+        if predicate(x):
+            return i
+        i += 1
