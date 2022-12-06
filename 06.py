@@ -10,7 +10,7 @@ def marker_found(tuple: List[str]):
 
 
 def main(filepath: str):
-    SLICE_SIZE = 4
+    SLICE_SIZE = 14
     output(
         (
             characters(filepath)
