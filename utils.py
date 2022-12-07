@@ -102,3 +102,10 @@ def index_of_first(iter, predicate):
         if predicate(x):
             return i
         i += 1
+
+
+@Pipe
+def foreach(iter, func):
+    for x in iter:
+        func(x)
+    return
