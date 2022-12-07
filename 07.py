@@ -53,10 +53,12 @@ def main(filepath: str):
         | foreach(handle_line)
     )
 
+    need_to_delete = 30000000 - 70000000 + dir_sizes["//"]
     output(
         dir_sizes.values()
-        | where(lambda size: size <= 100000)
-        | apply(sum)
+        | sort
+        | skip_while(lambda size: size < need_to_delete)
+        | take(1)
     )
 
 
