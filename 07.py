@@ -5,21 +5,12 @@ from utils import *
 def main(filepath: str):
     dir_stack = []
     dir_sizes = {"//": 0}
-    dirs_that_have_already_been_listed = set()
-    dir_being_listed = None
 
     def full_path_to_current_dir():
         return "/".join(dir_stack) + "/"
 
     def handle_line(line: str):
-        nonlocal dir_being_listed
-        args = line.split(" ")
-
-        if args[0] == "$" and dir_being_listed is not None:
-            dirs_that_have_already_been_listed.add(dir_being_listed)
-            dir_being_listed = None
-
-        match args:
+        match line.split(" "):
 
             case ["$", "cd", "/"]:
                 dir_stack.clear()
@@ -30,24 +21,19 @@ def main(filepath: str):
 
             case ["$", "cd", dir]:
                 dir_stack.append(dir)
-                current = full_path_to_current_dir()
-                if not current in dir_sizes:
-                    dir_sizes[current] = 0
+                dir_sizes[full_path_to_current_dir()] = 0
 
             case ["$", "ls"]:
-                current = full_path_to_current_dir()
-                if not current in dirs_that_have_already_been_listed:
-                    dir_being_listed = current
+                pass
 
             case ["dir", _]:
                 pass
 
             case [size, name]:
-                if dir_being_listed is not None:
-                    current = ""
-                    for dir in dir_stack:
-                        current += dir + "/"
-                        dir_sizes[current] += int(size)
+                current = ""
+                for dir in dir_stack:
+                    current += dir + "/"
+                    dir_sizes[current] += int(size)
 
     (
         lines(filepath)
