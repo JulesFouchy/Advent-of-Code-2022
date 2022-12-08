@@ -1,6 +1,7 @@
 from pipe import *
 from utils import *
 import math
+from itertools import product, zip_longest
 
 
 def main(filepath: str):
@@ -15,7 +16,7 @@ def main(filepath: str):
         | foreach(collect_heights_of_tree_line)
     )
 
-    visibilities = [[False for column in row] for row in height_map]
+    scenic_scores = [[1 for column in row] for row in height_map]
 
     def x_count():
         return len(height_map)
@@ -23,27 +24,26 @@ def main(filepath: str):
     def y_count():
         return len(height_map[0])
 
-    def check_visibility_from(x_y_ranges):
-        highest_seen = -math.inf
-        for x, y in x_y_ranges:
-            current_height = height_map[x][y]
-            if current_height > highest_seen:
-                visibilities[x][y] = True
-                highest_seen = current_height
+    for main_x, main_y in product(range(x_count()), range(y_count())):
+        main_height = height_map[main_x][main_y]
 
-    # Check visibility in the four directions
-    for y in range(y_count()):
-        check_visibility_from(zip(range(x_count()), [y] * x_count()))
-        check_visibility_from(zip(range(x_count()) | reverse, [y] * x_count()))
-    for x in range(x_count()):
-        check_visibility_from(zip([x] * y_count(), range(y_count())))
-        check_visibility_from(zip([x] * y_count(), range(y_count()) | reverse))
+        def explore(x_y_ranges):
+            trees_seen = 0
+            for x, y in x_y_ranges:
+                trees_seen += 1
+                if height_map[x][y] >= main_height:
+                    break
+            scenic_scores[main_x][main_y] *= trees_seen
+
+        explore(zip_longest(range(main_x + 1, x_count()), [], fillvalue=main_y))
+        explore(zip_longest(range(main_x) | reverse, [], fillvalue=main_y))
+        explore(zip_longest([], range(main_y + 1, y_count()), fillvalue=main_x))
+        explore(zip_longest([], range(main_y) | reverse, fillvalue=main_x))
 
     output(
-        visibilities
+        scenic_scores
         | traverse
-        | map(lambda is_visible: 1 if is_visible else 0)
-        | apply(sum)
+        | apply(max)
     )
 
 
