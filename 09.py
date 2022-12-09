@@ -25,35 +25,26 @@ def to_deltas(line: str):
 
 
 def main(filepath: str):
-    head_pos = np.array([0, 0])
-    tail_pos = np.array([0, 0])
+    # Head is the last in the list
+    knots_pos = [np.array([0, 0]) for _ in range(10)]
     visited_positions = set()
 
-    def adjust_tail_pos():
-        nonlocal tail_pos
+    def adjust_pos(index: int):
+        nonlocal knots_pos
 
-        delta = head_pos - tail_pos
-        norm = np.linalg.norm(delta)
+        delta = knots_pos[index+1] - knots_pos[index]
 
-        if norm == 1:
-            # 1 cell off in straight direction
-            return
-
-        elif norm == 2:
-            # 2 cells off in straight direction
-            tail_pos += delta // 2
-
-        elif norm > 2:
-            # Too far away in diagonal direction
-            # One coordinate of delta is ±1, and the other is ±2. We want both of these coordinate to be ±1 so that we move in a diagonal.
-            tail_pos += np.array([c // abs(c) for c in delta])
+        if np.linalg.norm(delta) >= 2:  # Too far away
+            # We want to go in the same quadrant / straight line as delta, but only have components equal to 0, +1 or -1 because we can only do 1 step.
+            knots_pos[index] += np.sign(delta)
 
     def move_head(delta: np.ndarray):
-        nonlocal head_pos, tail_pos
+        nonlocal knots_pos
 
-        head_pos += delta
-        adjust_tail_pos()
-        visited_positions.add(Position(x=tail_pos[0], y=tail_pos[1]))
+        knots_pos[-1] += delta
+        for i in range(len(knots_pos) - 1) | reverse:
+            adjust_pos(i)
+        visited_positions.add(Position(x=knots_pos[0][0], y=knots_pos[0][1]))
 
     ignore = (
         lines(filepath)
