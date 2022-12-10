@@ -1,5 +1,5 @@
 from pipe import Pipe
-
+import itertools
 
 def day_number(filepath: str):
     import pathlib
@@ -109,3 +109,9 @@ def foreach(iter, func):
     for x in iter:
         func(x)
     return
+
+
+@Pipe
+def accumulate(iter, func):
+    for x in itertools.accumulate(iter, func):
+        yield x
