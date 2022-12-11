@@ -79,13 +79,19 @@ def main(filepath: str):
 
     count_per_monkey = [0 for _ in monkeys]
 
+    common_multiple = (monkeys
+                       | map(lambda x: x.test_divisibility_by)
+                       | reduce(operator.mul)
+                       )
+
+
     def play_round():
         for i, monkey in enumerate(monkeys):
             for item in monkey.items:
 
                 count_per_monkey[i] += 1
 
-                worry_level = monkey.operation(item)
+                worry_level = monkey.operation(item) % common_multiple
 
                 if worry_level % monkey.test_divisibility_by == 0:
                     target_monkey = monkey.if_true_throw_to
