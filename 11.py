@@ -1,14 +1,51 @@
 from pipe import *
 from utils import *
 from dataclasses import dataclass
-from typing import List
+from typing import List, Protocol
 import operator
+
+
+class Operation(Protocol):
+    def __call__(self, old: int) -> int:
+        ...
+
+
+@dataclass
+class MultOperation:
+    qty: int
+
+    def __call__(self, old: int) -> int:
+        return self.qty * old
+
+
+@dataclass
+class AddOperation:
+    qty: int
+
+    def __call__(self, old: int) -> int:
+        return self.qty + old
+
+
+class SquareOperation:
+    def __call__(self, old: int) -> int:
+        return old * old
+
+
+def parse_operation(line: str) -> Operation:
+    match line.split(" "):
+        case ["*", "old"]:
+            return SquareOperation()
+        case ["*", qty]:
+            return MultOperation(int(qty))
+        case ["+", qty]:
+            return AddOperation(int(qty))
+    raise Exception("Unknown operation")
 
 
 @dataclass
 class Monkey:
     items: List[int]
-    operation: str
+    operation: Operation
     test_divisibility_by: int
     if_true_throw_to: int
     if_false_throw_to: int
@@ -19,7 +56,8 @@ def parse_monkey(lines: List[str]):
         items=list(lines[1].removeprefix(
             "  Starting items: ").split(", ") | map(int)),
 
-        operation=lines[2].removeprefix("  Operation: new = "),
+        operation=parse_operation(
+            lines[2].removeprefix("  Operation: new = old ")),
 
         test_divisibility_by=int(
             lines[3].removeprefix("  Test: divisible by ")),
@@ -47,7 +85,7 @@ def main(filepath: str):
 
                 count_per_monkey[i] += 1
 
-                worry_level = eval(monkey.operation.replace("old", str(item)))
+                worry_level = monkey.operation(item)
 
                 if worry_level % monkey.test_divisibility_by == 0:
                     target_monkey = monkey.if_true_throw_to
