@@ -48,7 +48,6 @@ def main(filepath: str):
                 count_per_monkey[i] += 1
 
                 worry_level = eval(monkey.operation.replace("old", str(item)))
-                worry_level //= 3
 
                 if worry_level % monkey.test_divisibility_by == 0:
                     target_monkey = monkey.if_true_throw_to
@@ -59,7 +58,7 @@ def main(filepath: str):
 
             monkey.items.clear()  # This monkey has thrown all its items
 
-    for _ in range(20):
+    for _ in range(10000):
         play_round()
 
     output(
