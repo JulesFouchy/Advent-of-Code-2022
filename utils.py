@@ -75,7 +75,7 @@ def groups_of(iter, n: int):
                 group.append(next(iter))
             yield group
     except StopIteration:
-        pass
+        yield group
 
 
 @Pipe
