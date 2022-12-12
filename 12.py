@@ -27,6 +27,8 @@ def main(filepath: str):
         positions = {starting_pos}
         length = 0
         while 0 == len([p for p in positions if height_map[p[0]][p[1]] == "E"]):
+            if len(positions) == 0:
+                raise Exception("Cul de sac!")
             length += 1
             new_positions = set()
             for pos in positions:
@@ -42,6 +44,10 @@ def main(filepath: str):
                     next_elevation = elevation(
                         height_map[next_pos[0]][next_pos[1]])
 
+                    # No need to look at paths that contain an "a" because we can always find a shorter path (the one that starts at the "a" that we just saw)
+                    if next_elevation == ord("a"):
+                        continue
+
                     if next_elevation > current_elevation + 1:
                         continue
 
@@ -54,7 +60,11 @@ def main(filepath: str):
     for x, y in itertools.product(range(width), range(height)):
         if elevation(height_map[x][y]) != ord('a'):
             continue
-        min_length = min(min_length, shortest_path_starting_at((x, y)))
+        print("---------------------------------------------------------", x, y)
+        try:
+            min_length = min(min_length, shortest_path_starting_at((x, y)))
+        except:
+            pass
 
     print(min_length)
 
