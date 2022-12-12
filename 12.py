@@ -1,9 +1,5 @@
-from pipe import *
-from utils import *
-from dataclasses import dataclass
-from typing import List, Protocol
-import operator
-import math
+from utils import lines, day_number, output
+import itertools
 
 
 def elevation(char: str) -> int:
@@ -15,9 +11,7 @@ def elevation(char: str) -> int:
 
 
 def main(filepath: str):
-    height_map = list(
-        lines(filepath)
-    )
+    height_map = list(lines(filepath))
 
     width = len(height_map)
     height = len(height_map[0])
@@ -29,53 +23,33 @@ def main(filepath: str):
         raise Exception("Target pos not found")
 
     starting_pos = find_pos("S")
-    target_pos = find_pos("E")
 
-    shortest_path = math.inf
+    positions = {starting_pos}
+    length = 0
+    while 0 == len([p for p in positions if height_map[p[0]][p[1]] == "E"]):
+        length += 1
+        new_positions = set()
+        for pos in positions:
+            current_elevation = elevation(height_map[pos[0]][pos[1]])
+            for delta_x, delta_y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                x = pos[0] + delta_x
+                y = pos[1] + delta_y
 
-    def visit(pos: tuple[int, int], steps_count: int, visited: set):
-        nonlocal shortest_path
-        visited.add(pos)
+                if x < 0 or x >= width or y < 0 or y >= height:
+                    continue
 
-        if steps_count >= shortest_path:
-            return
+                next_pos = (x, y)
+                next_elevation = elevation(
+                    height_map[next_pos[0]][next_pos[1]])
 
-        current_cell = height_map[pos[0]][pos[1]]
-        if current_cell == "E":
-            shortest_path = min(shortest_path, steps_count)
-            return
-        current_elevation = elevation(current_cell)
+                if next_elevation > current_elevation + 1:
+                    continue
 
-        def distance_to_target(delta: tuple[int, int]) -> int:
-            x = pos[0] + delta[0] - target_pos[0]
-            y = pos[1] + delta[1] - target_pos[1]
-            return x * x + y * y
+                new_positions.add(next_pos)
 
-        deltas = sorted(
-            [(0, 1), (0, -1), (1, 0), (-1, 0)],
-            key=distance_to_target
-        )
+        positions = new_positions
 
-        for delta_x, delta_y in deltas:
-            x = pos[0] + delta_x
-            y = pos[1] + delta_y
-
-            if x < 0 or x >= width or y < 0 or y >= height:
-                continue
-
-            next_pos = (x, y)
-            next_elevation = elevation(height_map[next_pos[0]][next_pos[1]])
-            if next_elevation > current_elevation + 1:
-                continue
-
-            if next_pos in visited:
-                continue
-
-            # We make a copy of the set because immutability is important
-            visit(next_pos, steps_count + 1, set(visited))
-
-    visit(starting_pos, 0, set())
-    output(shortest_path)
+    output(length)
 
 
 main(f"{day_number(__file__)}.input")
