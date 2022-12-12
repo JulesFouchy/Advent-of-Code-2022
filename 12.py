@@ -22,20 +22,19 @@ def main(filepath: str):
     width = len(height_map)
     height = len(height_map[0])
 
-    def find_starting_pos() -> tuple[int, int]:
+    def find_pos(target: str) -> tuple[int, int]:
         for x, y in itertools.product(range(width), range(height)):
-            if height_map[x][y] == "S":
+            if height_map[x][y] == target:
                 return (x, y)
-        raise Exception("Starting pos not found")
+        raise Exception("Target pos not found")
 
-    starting_pos = find_starting_pos()
+    starting_pos = find_pos("S")
+    target_pos = find_pos("E")
 
     shortest_path = math.inf
 
     def visit(pos: tuple[int, int], steps_count: int, visited: set):
-        print(pos)
         nonlocal shortest_path
-
         visited.add(pos)
 
         if steps_count >= shortest_path:
@@ -47,7 +46,17 @@ def main(filepath: str):
             return
         current_elevation = elevation(current_cell)
 
-        for delta_x, delta_y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+        def distance_to_target(delta: tuple[int, int]) -> int:
+            x = pos[0] + delta[0] - target_pos[0]
+            y = pos[1] + delta[1] - target_pos[1]
+            return x * x + y * y
+
+        deltas = sorted(
+            [(0, 1), (0, -1), (1, 0), (-1, 0)],
+            key=distance_to_target
+        )
+
+        for delta_x, delta_y in deltas:
             x = pos[0] + delta_x
             y = pos[1] + delta_y
 
