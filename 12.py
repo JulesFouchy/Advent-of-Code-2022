@@ -1,3 +1,4 @@
+import math
 from utils import lines, day_number, output
 import itertools
 
@@ -22,34 +23,40 @@ def main(filepath: str):
                 return (x, y)
         raise Exception("Target pos not found")
 
-    starting_pos = find_pos("S")
+    def shortest_path_starting_at(starting_pos:  tuple[int, int]):
+        positions = {starting_pos}
+        length = 0
+        while 0 == len([p for p in positions if height_map[p[0]][p[1]] == "E"]):
+            length += 1
+            new_positions = set()
+            for pos in positions:
+                current_elevation = elevation(height_map[pos[0]][pos[1]])
+                for delta_x, delta_y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                    x = pos[0] + delta_x
+                    y = pos[1] + delta_y
 
-    positions = {starting_pos}
-    length = 0
-    while 0 == len([p for p in positions if height_map[p[0]][p[1]] == "E"]):
-        length += 1
-        new_positions = set()
-        for pos in positions:
-            current_elevation = elevation(height_map[pos[0]][pos[1]])
-            for delta_x, delta_y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                x = pos[0] + delta_x
-                y = pos[1] + delta_y
+                    if x < 0 or x >= width or y < 0 or y >= height:
+                        continue
 
-                if x < 0 or x >= width or y < 0 or y >= height:
-                    continue
+                    next_pos = (x, y)
+                    next_elevation = elevation(
+                        height_map[next_pos[0]][next_pos[1]])
 
-                next_pos = (x, y)
-                next_elevation = elevation(
-                    height_map[next_pos[0]][next_pos[1]])
+                    if next_elevation > current_elevation + 1:
+                        continue
 
-                if next_elevation > current_elevation + 1:
-                    continue
+                    new_positions.add(next_pos)
 
-                new_positions.add(next_pos)
+            positions = new_positions
+        return length
 
-        positions = new_positions
+    min_length = math.inf
+    for x, y in itertools.product(range(width), range(height)):
+        if elevation(height_map[x][y]) != ord('a'):
+            continue
+        min_length = min(min_length, shortest_path_starting_at((x, y)))
 
-    output(length)
+    print(min_length)
 
 
 main(f"{day_number(__file__)}.input")
