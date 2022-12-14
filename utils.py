@@ -68,6 +68,7 @@ def output(x):
 
 @Pipe
 def groups_of(iter, n: int):
+    group = []
     try:
         while True:
             group = []
@@ -75,7 +76,8 @@ def groups_of(iter, n: int):
                 group.append(next(iter))
             yield group
     except StopIteration:
-        yield group
+        if group:
+            yield group
 
 
 @Pipe
