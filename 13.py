@@ -1,17 +1,27 @@
 from utils import *
 from pipe import *
+import functools
+
+
+def comparison(x, y):
+    cmp = is_in_order([x, y])
+    if cmp is None:
+        return 0
+    return -1 if cmp else 1
 
 
 def main(filepath: str):
-    output(
+    packets = list(
         lines(filepath)
         | where(lambda l: l)  # Remove empty lines
         | map(eval)  # Parse lists from string
-        | groups_of(2)
-        | apply(enumerate)
-        | where(lambda x: is_in_order(x[1]))
-        | map(lambda x: x[0] + 1)
-        | apply(sum)
+    )
+    packets.append([[2]])
+    packets.append([[6]])
+    sorted_packets = sorted(packets, key=functools.cmp_to_key(comparison))
+    print(
+        (sorted_packets.index([[2]]) + 1) *
+        (sorted_packets.index([[6]]) + 1)
     )
 
 
