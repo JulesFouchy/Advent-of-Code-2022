@@ -2,11 +2,12 @@ from utils import *
 from pipe import *
 from dataclasses import dataclass
 from typing import List, Tuple
+from collections import defaultdict
 import os
 import time
 
 
-@dataclass
+@dataclass(frozen=True, eq=True)
 class Pos:
     x: int
     y: int
@@ -23,10 +24,9 @@ def main(filepath: str):
     )
 
     left, right = find_x_bounds(paths)
-    width = right-left+1
     height = find_max_y(paths)+1
 
-    terrain = [["."] * width for _ in range(height)]
+    terrain = defaultdict(lambda: ".")
 
     # Put rocks
     for path in paths:
@@ -38,15 +38,18 @@ def main(filepath: str):
             y1 = min(p1.y, p2.y)
             y2 = max(p1.y, p2.y)
             for x, y in itertools.product(range(x1, x2+1), range(y1, y2+1)):
-                terrain[y][x-left] = "#"
+                terrain[Pos(x-left, y)] = "#"
 
     def at(pos: Pos) -> str:
-        return terrain[pos.y][pos.x]
+        return terrain[pos]
 
     def write_at(pos: Pos, char: str) -> None:
-        terrain[pos.y][pos.x] = char
+        terrain[pos] = char
 
     def next_pos(sand_pos: Pos) -> Pos:
+        if sand_pos.y == height:  # Simulate an infinite floor
+            return sand_pos
+
         candidate_pos = Pos(x=sand_pos.x, y=sand_pos.y+1)
         if at(candidate_pos) == ".":
             return candidate_pos
@@ -63,22 +66,17 @@ def main(filepath: str):
 
     # Simulate sand
     units = 0
-    try:
-        while True:
-            sand_pos = Pos(x=500-left, y=0)
+    while True:
+        sand_pos = Pos(x=500-left, y=0)
+        next_p = next_pos(sand_pos)
+        while sand_pos != next_p:
+            sand_pos = next_p
             next_p = next_pos(sand_pos)
-            while sand_pos != next_p:
-                # write_at(sand_pos, "o")
-                # render(terrain)
-                # write_at(sand_pos, ".")
-                # time.sleep(0.1)
+        write_at(sand_pos, "o")
+        units += 1
 
-                sand_pos = next_p
-                next_p = next_pos(sand_pos)
-            write_at(sand_pos, "o")
-            units += 1
-    except(IndexError):
-        pass
+        if sand_pos == Pos(500-left, 0):
+            break
     print(units)
 
 
@@ -102,14 +100,6 @@ def find_x_bounds(paths: List[Path]) -> Tuple[int, int]:
 def find_max_y(paths: List[Path]) -> int:
     y_coords = list(paths | traverse | map(lambda pos: pos.y))
     return max(y_coords)
-
-
-def render(terrain):
-    os.system("cls")
-    for line in terrain:
-        for char in line:
-            print(char, end="")
-        print()
 
 
 main(f"{day_number(__file__)}.input")
