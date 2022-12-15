@@ -22,23 +22,21 @@ def main(filepath: str):
         | map(parse_sensor)
     )
 
+    row_to_check = 2000000
+
     pos_where_beacon_can_not_be = set()
     for sensor in sensors:
         dist = manhattan_distance(sensor.pos, sensor.closest_beacon_pos)
-        for total in range(0, dist+1):
-            for x in range(total+1):
-                y = total - x
-                for x_sign in [-1, 1]:
-                    for y_sign in [-1, 1]:
-                        pos = Pos(x*x_sign+sensor.pos.x, y*y_sign+sensor.pos.y)
-                        if pos == sensor.closest_beacon_pos:
-                            continue
-                        pos_where_beacon_can_not_be.add(pos)
+        dist_to_row = abs(sensor.pos.y - row_to_check)
+        for x in range(0, dist-dist_to_row + 1):
+            for x_sign in [-1, 1]:
+                pos = Pos(x*x_sign+sensor.pos.x, row_to_check)
+                if pos == sensor.closest_beacon_pos:
+                    continue
+                pos_where_beacon_can_not_be.add(pos)
 
-    row_to_check = 2000000
     output(
         pos_where_beacon_can_not_be
-        | where(lambda pos: pos.y == row_to_check)
         | count_elements
     )
 
