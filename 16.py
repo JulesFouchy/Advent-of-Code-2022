@@ -1,13 +1,22 @@
 from utils import *
 from pipe import *
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 
 
 @dataclass
 class Valve:
     flow_rate: int
     connections: List[str]
+    opened: bool = False
+
+
+@dataclass
+class State:
+    current: str
+    timer: int
+    is_open: Dict[str, bool]
+    accumulated_pressure: int
 
 
 def main(filepath: str):
@@ -26,7 +35,11 @@ def main(filepath: str):
         lines(filepath)
         | foreach(parse_valve)
     )
-    print(valves)
+
+    def try_strategy()
+    current = 'AA'
+    timer = 30
+    while
 
 
 main(f"{day_number(__file__)}.test")
